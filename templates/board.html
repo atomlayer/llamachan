@@ -62,10 +62,10 @@
             <div class="op">
                 <div class="op_title">
                     <div class="op_text_title_main">
-                        {{ thread['posts'][0]['subject'] }}
+                        {{ thread['op']['subject'] }}
                     </div>
 
-                    <div class="op_text_title">&nbsp;Anonymous&nbsp;{{ thread['posts'][0]['date_time_of_creation'] }} No.{{ thread['id'] }}</div>
+                    <div class="op_text_title">&nbsp;Anonymous&nbsp;{{ thread['op']['date_time_of_creation'] }} No.{{ thread['id'] }}</div>
 
                     <a class="reply_link" href="/thread/{{ thread['id'] }}">&nbsp;&nbsp;Reply</a>
 <!--                    <a href="#" onclick="showForm(this); return false;"-->
@@ -75,18 +75,24 @@
 
                     <div class="post_text">
 
-                        {% if thread['posts'][0]['image_file_name']!="" %}
+                        {% if thread['op']['image_file_name']!="" %}
                                 <img alt="Post Image" class="image" onclick="open_full_image(this)"
-                                src="static/uploads/{{ thread['posts'][0]['image_file_name'] }}">
+                                src="static/uploads/{{ thread['op']['image_file_name'] }}">
                         {% endif %}
 
-                        {{ thread['posts'][0]['comment'] }}
+                        {{ thread['op']['comment'] }}
                     </div>
                 </div>
                 <div class="back_links"></div>
             </div>
 
-            {% for post in thread["posts"][1:4] %}
+            {% if thread['missed_posts_count']!=0 %}
+                <div class="omitted">{{ thread['missed_posts_count'] }} replies omitted.
+                    <a class="reply_link" href="/thread/{{ thread['id'] }}">Click here</a> to view.
+                </div>
+            {% endif %}
+
+            {% for post in thread["posts"] %}
                 <div class="post" >
                     <div class="post_title">
                         <div class="op_text_title_main">{{ post['subject'] }}</div>

@@ -24,7 +24,7 @@ amount_of_new_posts_in_new_thread = 5
 
 open_ai_api_client = OpenAI(base_url=db.get_setting_value("openai_base_url"),
                             api_key=db.get_setting_value("openai_api_key"))
-probability_of_a_picture_appearing_in_a_post = int(db.get_setting_value("probability_of_a_picture_appearing_in_a_post"))
+
 
 
 def create_thread(comment, subject, board_name, image_file_name, is_your_thread):
@@ -39,8 +39,6 @@ def generate_new_posts(thread_id, amount_of_new_posts=5):
 
     new_post_count = 0
 
-
-
     while new_post_count < amount_of_new_posts:
         new_posts = llm_generate(posts, db)
         posts.extend(new_posts)
@@ -49,13 +47,16 @@ def generate_new_posts(thread_id, amount_of_new_posts=5):
             last_post_number += 1
             new_post_count += 1
 
-            new_image_file_name=""
-            random_number = random.randint(0, 100)
-            if random_number <= probability_of_a_picture_appearing_in_a_post:
-                image_prompt = img_generator.generate_prompt(message=n)
-                new_image_file_name = str(uuid.uuid4()) + ".png"
-                img_generator.generate_image(prompt=image_prompt, file_name=new_image_file_name)
+            new_image_file_name = ""
 
+            if db.is_an_API_used_to_generate_images():
+                random_number = random.randint(0, 100)
+                probability_of_a_picture_appearing_in_a_post = int(
+                    db.get_setting_value("probability_of_a_picture_appearing_in_a_post"))
+                if random_number <= probability_of_a_picture_appearing_in_a_post:
+                    image_prompt = img_generator.generate_prompt(message=n)
+                    new_image_file_name = str(uuid.uuid4()) + ".png"
+                    img_generator.generate_image(prompt=image_prompt, file_name=new_image_file_name)
 
             db.add_post(n, "", thread_id, last_post_number, new_image_file_name)
 
@@ -145,9 +146,11 @@ def add_post():
     comment = "OP: " + data["comment"]
 
     new_image_file_name = ""
-    if request.files.get('image_file').filename != "":
-        image_file = request.files.get('image_file')
-        new_image_file_name = upload_image(image_file)
+
+    if db.is_an_API_used_to_generate_images():
+        if request.files.get('image_file').filename != "":
+            image_file = request.files.get('image_file')
+            new_image_file_name = upload_image(image_file)
 
     last_post_number = db.get_last_post_number_in_thread(thread_id)
     db.add_post(comment, "", thread_id, last_post_number + 1, new_image_file_name)
@@ -227,6 +230,22 @@ def view_settings():
     return render_template('settings.html', data=data)
 
 
+# import os
+# import sys
+# import subprocess
+#
+#
+# def restart_flask_app():
+#     # Get the current Python executable and script path
+#     executable = sys.executable
+#     script_path = os.path.abspath(sys.argv[0])
+#
+#     # Launch a new instance of the Flask app using subprocess
+#     subprocess.Popen([executable, script_path])
+#
+#     # Exit the current instance of the app
+#     sys.exit()
+
 @app.route('/save_settings', methods=['POST'])
 def save_settings():
     data = request.form
@@ -239,6 +258,8 @@ def save_settings():
     board_names = db.get_board_names()
     data["board_names"] = board_names
     data["board_name_count"] = len(board_names)
+
+    # restart_flask_app()
 
     return render_template('settings.html', data=data)
 

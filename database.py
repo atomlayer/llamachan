@@ -175,6 +175,9 @@ class sql:
             if default_value is None:
                 default_value = value
 
+            if full_desc is None:
+                full_desc = short_desc
+
             conn = sqlite3.connect(self.db_file)
             cursor = conn.cursor()
             sql = '''INSERT OR IGNORE INTO settings(short_description, full_description, 
@@ -265,7 +268,17 @@ class sql:
                                 limit {page_number * number_of_threads_on_the_page}, {number_of_threads_on_the_page}""")
 
         for i, n in enumerate(threads):
-            threads[i]["posts"] = self.get_posts_by_thread_id(n["id"])
+            posts = self.get_posts_by_thread_id(n["id"])
+            op = posts[0]
+            answers = posts[1:]
+            last = answers[-3:]
+
+            missed_posts_count = len(posts)-len(last)-1
+
+            threads[i]["op"] = op
+            threads[i]["posts"] = last
+            threads[i]["missed_posts_count"] = missed_posts_count
+
         return threads
 
     def get_board_names(self):
@@ -302,3 +315,8 @@ class sql:
                                  set image_file_name = '{img_file_name}'
                                  where thread_id = {thread_id}
                                  and number_in_thread = 1""")
+
+    def is_an_API_used_to_generate_images(self):
+        if self.get_setting_value("automatic1111_host") == "":
+            return False
+        return True
