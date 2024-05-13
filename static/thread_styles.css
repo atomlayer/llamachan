@@ -1,0 +1,55 @@
+
+.container {
+
+    max-width: 100%;
+    margin: 20px;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.draggable {
+    position: absolute;
+    width: 410px;
+    height: 310px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+
+    cursor: move;
+    display: none;
+    z-index: 1000;
+}
+
+#post_form_container {
+    padding: 10px;
+}
+
+.closeButton {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}
+
+#reply_to_thread {
+    background-color: rgb(187, 187, 187);
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+}
+
+
+
+
+
+
+
+

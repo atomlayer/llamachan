@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ data['subject'] }}</title>
+
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='posts.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='thread_styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='image_styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='links.css') }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='notification.css') }}">
+    <script src="{{ url_for('static', filename='notification.js') }}"></script>
+
+
+    <script>
+        count_of_posts = 1
+        threadId = {{ data['thread_id'] }};
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const op = document.querySelector('.op');
+            op.id = 'no_' + threadId.toString();
+        });
+
+    </script>
+
+    <script src="{{ url_for('static', filename='thread_scripts.js') }}"></script>
+    <script src="{{ url_for('static', filename='image_script.js') }}"></script>
+</head>
+
+
+<body>
+
+{% include 'links.html' %}
+<hr>
+
+<div class="container">
+
+    <div class="op">
+        <div class="op_title">
+            <div class="op_text_title_main">
+                {{ data['op']['subject'] }}
+            </div>
+
+            <div class="op_text_title">&nbsp;Anonymous&nbsp;{{ data['op']['date_time_of_creation'] }}</div>
+            <a href="#" onclick="showForm(this); return false;" class="post_number">#{{ data['op']['number_in_thread'] }}</a>
+        </div>
+        <div class="post_context">
+
+            <div class="post_text">
+
+                {% if data['op']['image_file_name']!="" %}
+                     <img alt="Post Image" class="image" onclick="open_full_image(this)"
+                     src="{{ url_for('static', filename='/uploads/' + data['op']['image_file_name']) }}">
+                {% endif %}
+
+                {{ data['op']['comment'] }}
+            </div>
+        </div>
+        <div class="back_links"></div>
+    </div>
+
+</div>
+
+
+<div id="footer_links">
+    <a class ="post_link" onclick="goBack()" href="#">Return</a> &nbsp;|&nbsp;
+    <a class ="post_link" onclick="goToTop()" href="#">Top</a> &nbsp;|&nbsp;
+    <a class ="post_link" onclick="refreshPage()" href="#"> Update </a> &nbsp;|&nbsp;
+    <a class ="post_link" href="#" onclick="showForm(this); return false;">Post a Reply</a>
+</div>
+
+<div id="more_post_container">
+    <button class ="more_post_button" onclick="generateMorePosts()">Generate more</button>
+</div>
+
+
+<div id="draggableForm" class="draggable">
+    <div id="reply_to_thread">Reply to Thread</div>
+    <span class="closeButton" onclick="closeForm()">X</span>
+
+    <div id="post_form_container">
+        <form action="/add_post" method="post" onsubmit="submitForm(); return false;">
+            <label for="contextAreaComment">Comment:</label><br>
+            <textarea id="contextAreaComment" required name="comment" rows="10" cols="50"></textarea><br><br>
+            <input type="hidden" id="hiddenField" name="thread_id" value="{{ data['thread_id'] }}">
+            <input type="file" id="imageUpload" name="image_file"
+                   accept="image/jpeg, image/png, image/gif"><br><br>
+            <button type="submit">Post</button>
+        </form>
+    </div>
+</div>
+
+<hr>
+{% include 'links.html' %}
+
+</body>
+</html>

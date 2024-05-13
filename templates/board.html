@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ data['board_title'] }}</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='posts.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='board.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='image_styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='links.css') }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='notification.css') }}">
+    <script src="{{ url_for('static', filename='notification.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+
+    <script>
+        board_name = '{{ data['board'] }}'
+    </script>
+
+    <script src="{{ url_for('static', filename='board.js') }}"></script>
+    <script src="{{ url_for('static', filename='image_script.js') }}"></script>
+</head>
+<body>
+{% include 'links.html' %}
+
+<div id="title"><a id="a_title" href="/{{ data['board'] }}">{{ data['board_title'] }}</a></div>
+
+<div id="add_thread">
+    <div class="container_new_thread"><h2>Start a New Thread</h2></div>
+    <div class="container_new_thread">
+
+        <br>
+        <form action="/create_new_thread" method="post"
+              enctype="multipart/form-data">
+            <label for="lineField">Subject:</label><br>
+            <input type="text" id="lineField" name="subject" class="long-input"><br><br>
+            <label for="contextArea">Comment:</label><br>
+            <textarea id="contextArea" required name="comment" rows="10" cols="50"></textarea><br><br>
+            <input type="hidden" id="hiddenField" name="board_name" value="{{ data['board'] }}">
+            <input type="file" id="imageUpload" required name="image_file"
+                   accept="image/jpeg, image/png, image/gif"><br><br>
+            <button type="submit">Post</button>
+        </form>
+    </div>
+</div>
+<br><br>
+<div id="more_post_container">
+    <button class ="more_post_button"
+            onclick="generate_more_threads(); showNotification('Thread generation is running...')">
+        Generate more threads</button>
+</div>
+
+
+<hr>
+
+<div id="container_threads">
+
+    {% for thread in data["threads"] %}
+        <div class="thread">
+            <div class="op">
+                <div class="op_title">
+                    <div class="op_text_title_main">
+                        {{ thread['posts'][0]['subject'] }}
+                    </div>
+
+                    <div class="op_text_title">&nbsp;Anonymous&nbsp;{{ thread['posts'][0]['date_time_of_creation'] }} No.{{ thread['id'] }}</div>
+
+                    <a class="reply_link" href="/thread/{{ thread['id'] }}">&nbsp;&nbsp;Reply</a>
+<!--                    <a href="#" onclick="showForm(this); return false;"-->
+<!--                       class="post_number">#{{ thread['posts'][0]['number_in_thread'] }}</a>-->
+                </div>
+                <div class="post_context">
+
+                    <div class="post_text">
+
+                        {% if thread['posts'][0]['image_file_name']!="" %}
+                                <img alt="Post Image" class="image" onclick="open_full_image(this)"
+                                src="static/uploads/{{ thread['posts'][0]['image_file_name'] }}">
+                        {% endif %}
+
+                        {{ thread['posts'][0]['comment'] }}
+                    </div>
+                </div>
+                <div class="back_links"></div>
+            </div>
+
+            {% for post in thread["posts"][1:4] %}
+                <div class="post" >
+                    <div class="post_title">
+                        <div class="op_text_title_main">{{ post['subject'] }}</div>
+                        <div class="op_text_title"> Anonymous&nbsp;{{ post['date_time_of_creation'] }}</div>
+<!--                        <a href="#" onclick="showForm(this); return false;" class="post_number"></a>-->
+                    </div>
+                    <div class="post_text">
+
+                        {% if post['image_file_name']!="" %}
+                            <img alt="Post Image" class="image" onclick="open_full_image(this)"
+                            src="static/uploads/{{ post['image_file_name'] }}">
+                        {% endif %}
+
+                        {{ post['comment'] }}
+                    </div>
+               </div>
+
+            {% endfor %}
+
+        </div>
+    <hr>
+
+    {% endfor %}
+</div>
+
+
+
+<div id = "pages">
+    {% for page in data["pages"] %}
+         [<a class ="reply_link" href="/{{ data['board'] }}/{{ page }}">{{ page }}</a>]
+    {% endfor %}
+</div>
+
+
+{% include 'links.html' %}
+
+
+
+</body>
+</html>

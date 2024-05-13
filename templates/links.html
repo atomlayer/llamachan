@@ -1,0 +1,15 @@
+<div class="all_links">
+
+    [&nbsp;<a class="all_link" href="/">Home</a>&nbsp;/&nbsp;
+
+    <a class="all_link" href="/settings">Settings</a>&nbsp;/&nbsp;
+
+    {% for i in range(data["board_name_count"]) %}
+        <a class="all_link" onclick="showNotification('Thread generation is running...')"
+           href="/{{ data["board_names"][i]["name"] }}">{{ data["board_names"][i]["name"] }}</a>&nbsp;
+        {% if i!=data["board_name_count"]-1 %}
+            /&nbsp;
+        {% endif %}
+    {% endfor %}
+    ]
+</div>

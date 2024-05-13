@@ -1,0 +1,16 @@
+
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  background-color: #f1f1f1;
+  padding: 13px;
+  border: 2px solid #ff0000;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgb(255, 102, 0);
+  font-weight: bold;
+  color: #333;
+  background-image: linear-gradient(to bottom, #f1f1f1, #ffffff);
+}

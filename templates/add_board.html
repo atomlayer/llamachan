@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add board</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='links.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='settings.css') }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='notification.css') }}">
+    <script src="{{ url_for('static', filename='notification.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='add_new_board.js') }}"></script>
+</head>
+<body>
+
+{% include 'links.html' %}
+<hr>
+
+
+<div class="settings_container"><h2>Add board</h2></div>
+
+<div class="settings_container">
+    <form action="/add_new_board" method="post" enctype="multipart/form-data" onsubmit="add_new_board_handler(this)">
+
+            <label for="lineField_board_name">Board name (example: b, a, pol)</label>
+            <input type="text" id="lineField_board_name" name="board_name" class="long-input" required >
+            <br>
+            <label for="lineField_board_description">Board description (example: /b - random, /pol - politics)</label>
+            <input type="text" id="lineField_board_description" name="board_description" class="long-input" required >
+            <br>
+
+        <button type="submit">Save</button>
+    </form>
+</div>
+
+
+
+</body>
+</html>

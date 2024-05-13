@@ -1,0 +1,48 @@
+
+        .container_new_thread {
+            display: flex;
+            justify-content: center;
+        }
+
+        #title {
+            display: flex;
+            justify-content: center;
+
+            margin-top: 50px;
+            margin-bottom: 30px;
+        }
+
+        #a_title, #a_title:hover, #a_title:active {
+            font-size: 36px;
+            color: rgb(255, 102, 0);
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+
+
+
+
+        .error {
+            color: red;
+        }
+
+#add_thread {
+    margin-bottom: 40px;
+}
+
+
+.reply_link{
+    text-decoration: none;
+    color: rgb(255, 102, 0);
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#pages{
+    padding: 10px;
+    display: inline-block;
+    background-color: #DDDDDD;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}

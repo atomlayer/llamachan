@@ -1,0 +1,14 @@
+        body {
+            font-family: arial, helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #EEEEEE
+        }
+
+        .long-input {
+            width: 100%; /* Adjust this value to set the desired width */
+            box-sizing: border-box;
+        }
+
+
+

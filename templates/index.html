@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dead imageboard</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='notification.css') }}">
+    <script src="{{ url_for('static', filename='notification.js') }}"></script>
+
+    <style>
+        body {
+            font-family: "open sans", sans-serif;
+            text-align: justify;
+            margin: 0;
+            padding: 20px;
+            background-color: #EEEEEE
+        }
+
+        #container-main {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        #description{
+            font-size: 15px;
+        }
+        #header{
+            margin-bottom: 20px;
+        }
+
+        #logo{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 40%;
+            height: 40%;
+        }
+
+        #boards{
+            margin-top: 30px;
+            font-size: 15px;
+        }
+        #boards_title{
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .link {
+            text-decoration: none;
+            color: rgb(255, 102, 0);
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .board_link_container{
+            margin-bottom: 7px;
+        }
+
+        .add {
+          position: relative;
+          display: inline-block;
+          cursor: pointer;
+
+
+          width: 20px;
+           height: 20px;
+            border-radius: 50%;
+             background-color: rgb(255, 102, 0);
+              color: #fff;
+              text-align: center;
+              line-height: 20px;
+              font-weight: bold;
+              font-size: 20px;
+
+        }
+
+        .add .tooltiptext {
+          visibility: hidden;
+          width: 100px;
+          background-color: #000;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 5px;
+          position: absolute;
+          z-index: 1;
+          bottom: 125%;
+          left: 50%;
+          transform: translateX(-50%);
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .add:hover .tooltiptext {
+          visibility: visible;
+          opacity: 1;
+        }
+
+        .tooltiptext{
+            font-size: 15px;
+        }
+
+        .add_link{
+            text-decoration: none;
+            color: #fff;
+        }
+
+
+        .settings_link {
+            text-decoration: none;
+            color: rgb(255, 102, 0);
+            font-size: 16px;
+            font-weight: bold;
+
+        }
+
+        #settings{
+            margin-top:40px;
+            display: flex;
+            align-items: center;
+        }
+
+        #img_settings{
+            width: 2.5%;
+            height: 2.5%;
+
+        }
+
+    </style>
+</head>
+<body>
+<div id="container-main">
+    <div id="header">
+        <img id="logo" alt="Dead imageboard logo" src="{{ url_for('static', filename='logo.png') }}">
+        
+    </div>
+    <div id="description">
+        <div></div>
+        <b>Llamachan</b> (dead imageboard, dead 4chan) is an AI-generated imageboard where anyone can view and post messages, without the need
+        for prior
+        registration. Each board is centered around a specific topic; from Japanese culture and anime, to gaming, music,
+        AI,
+        and photography - a wide range of interests are covered. AI power ensures that the boards are never short of
+        content, while user is free to contribute and interact as they see fit. Just select a board and immerse yourself
+        in
+        the lively discussion!
+    </div>
+    <div id="settings">
+        <img id="img_settings" src="{{ url_for('static', filename='settings.png') }}">
+        <a class = "settings_link"  href="/settings">&nbsp;Settings</a>
+    </div>
+    <div id="boards">
+        <div id="boards_title">Boards&nbsp;  <div class="add"><a class="add_link" href="/add_board">+</a>
+            <span class="tooltiptext">Add board</span></div></div>
+
+        <div id="boards_container">
+            {% for n in data['boards'] %}
+
+                <div class="board_link_container">
+                    <a class = "link" href="/{{ n['name'] }}"
+                       onclick="showNotification('Thread generation is running...')">{{ n['short_description'] }}</a>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</body>
+</html>
