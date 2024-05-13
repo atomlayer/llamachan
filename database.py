@@ -62,9 +62,9 @@ class sql:
         self.add_setting(short_desc="model", value="command-r:latest", category="llm api")
         self.add_setting(short_desc="max_tokens", value="4096", category="llm api")
 
-        # self.add_setting(short_desc="automatic1111_host", value="127.0.0.1", category="automatic1111 api")
+        self.add_setting(short_desc="automatic1111_host", value="127.0.0.1", category="automatic1111 api")
 
-        self.add_setting(short_desc="automatic1111_host", value="192.168.50.154", category="automatic1111 api")
+        # self.add_setting(short_desc="automatic1111_host", value="192.168.50.154", category="automatic1111 api")
 
         self.add_setting(short_desc="automatic1111_port", value="7860", category="automatic1111 api")
         self.add_setting(short_desc="automatic1111_use_https", value="0", category="automatic1111 api")
