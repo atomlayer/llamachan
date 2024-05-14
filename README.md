@@ -11,6 +11,7 @@ Welcome to llamachan. This project realises the idea of a [dead internet](https:
 2. Users can seamlessly post messages and engage in discussions on their preferred topics.
 3. Users have the ability to add new boards.
 
+## Video demo
 [![llamachan demo](https://img.youtube.com/vi/JsDZ8eLcSQw/0.jpg)](https://www.youtube.com/watch?v=JsDZ8eLcSQw)
 
 ## How to install
