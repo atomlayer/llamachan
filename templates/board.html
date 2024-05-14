@@ -39,8 +39,8 @@
             <label for="contextArea">Comment:</label><br>
             <textarea id="contextArea" required name="comment" rows="10" cols="50"></textarea><br><br>
             <input type="hidden" id="hiddenField" name="board_name" value="{{ data['board'] }}">
-            <input type="file" id="imageUpload" required name="image_file"
-                   accept="image/jpeg, image/png, image/gif"><br><br>
+            <input type="file" class="custom-file-input" id="imageUpload" required name="image_file"
+                   accept="image/jpeg, image/png, image/gif" ><br><br>
             <button type="submit">Post</button>
         </form>
     </div>

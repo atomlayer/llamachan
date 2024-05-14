@@ -32,7 +32,8 @@ function generate_more_threads() {
 }
 
 
-$(document).ready(function () {
 
+
+$(document).ready(function () {
 
 });

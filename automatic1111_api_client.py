@@ -8,14 +8,15 @@ class ImageGenerator:
     def __init__(self, db):
         self.db = db
 
-        use_https = True if db.get_setting_value("automatic1111_use_https") == "1" else False
-        self.api = webuiapi.WebUIApi(host=db.get_setting_value("automatic1111_host"),
-                                         port=int(db.get_setting_value("automatic1111_port")),
-                                         use_https=use_https,
-                                         sampler=db.get_setting_value("automatic1111_sampler"),
-                                         steps=db.get_setting_value("automatic1111_steps"))
-        self.llm_client = OpenAI(base_url=db.get_setting_value("openai_base_url"),
-                                     api_key=db.get_setting_value("openai_api_key"))
+        if self.db.is_an_API_used_to_generate_images():
+            use_https = True if db.get_setting_value("automatic1111_use_https") == "1" else False
+            self.api = webuiapi.WebUIApi(host=db.get_setting_value("automatic1111_host"),
+                                             port=int(db.get_setting_value("automatic1111_port")),
+                                             use_https=use_https,
+                                             sampler=db.get_setting_value("automatic1111_sampler"),
+                                             steps=db.get_setting_value("automatic1111_steps"))
+            self.llm_client = OpenAI(base_url=db.get_setting_value("openai_base_url"),
+                                         api_key=db.get_setting_value("openai_api_key"))
 
     def generate_image(self, prompt, file_name):
         result = self.api.txt2img(prompt=prompt,

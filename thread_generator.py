@@ -26,7 +26,7 @@ def llm_generate(thread_data, db):
                     api_key=db.get_setting_value("openai_api_key"))
 
     max_tokens = int(db.get_setting_value("max_tokens_for_thread"))
-    system_prompt = "Continue the dialog on 4chan. You can add links to other posts (example no.1 - link to the post)"
+    system_prompt = "Continue the dialog on 4chan. You can add links to other posts (example no.1 - link to the post). Don't answer for OP."
 
     prompt = []
     for i, n in enumerate(thread_data):
