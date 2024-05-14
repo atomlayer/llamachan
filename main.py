@@ -174,11 +174,12 @@ def generate_new_threads(board_name):
 
     for op_post_name in op_post_names:
         op_post = op_post_generator(db, open_ai_api_client, op_post_name)
-        thread_id = create_thread(op_post, op_post_name[:150], board_name, None, is_your_thread=False)
+        thread_id = create_thread(op_post, op_post_name[:150], board_name, "", is_your_thread=False)
 
         generate_new_posts(thread_id, amount_of_new_posts=3)
 
-        generate_image_for_op_post(thread_id, op_post_name[:150])
+        if db.is_an_API_used_to_generate_images():
+            generate_image_for_op_post(thread_id, op_post_name[:150])
 
 
 @app.route('/generate_more_threads', methods=['POST'])
