@@ -278,7 +278,6 @@ class sql:
             threads[i]["op"] = op
             threads[i]["posts"] = last
             threads[i]["missed_posts_count"] = missed_posts_count
-
         return threads
 
     def get_board_names(self):

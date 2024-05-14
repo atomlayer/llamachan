@@ -68,8 +68,7 @@
                     <div class="op_text_title">&nbsp;Anonymous&nbsp;{{ thread['op']['date_time_of_creation'] }} No.{{ thread['id'] }}</div>
 
                     <a class="reply_link" href="/thread/{{ thread['id'] }}">&nbsp;&nbsp;Reply</a>
-<!--                    <a href="#" onclick="showForm(this); return false;"-->
-<!--                       class="post_number">#{{ thread['posts'][0]['number_in_thread'] }}</a>-->
+
                 </div>
                 <div class="post_context">
 
@@ -92,25 +91,27 @@
                 </div>
             {% endif %}
 
+
+
             {% for post in thread["posts"] %}
                 <div class="post" >
-                    <div class="post_title">
-                        <div class="op_text_title_main">{{ post['subject'] }}</div>
-                        <div class="op_text_title"> Anonymous&nbsp;{{ post['date_time_of_creation'] }}</div>
-<!--                        <a href="#" onclick="showForm(this); return false;" class="post_number"></a>-->
-                    </div>
-                    <div class="post_text">
+                        <div class="post_title">
+                            <div class="op_text_title_main">{{ post['subject'] }}</div>
+                            <div class="op_text_title"> Anonymous&nbsp;{{ post['date_time_of_creation'] }}</div>
+                        </div>
+                        <div class="post_text">
 
-                        {% if post['image_file_name']!="" %}
-                            <img alt="Post Image" class="image" onclick="open_full_image(this)"
-                            src="static/uploads/{{ post['image_file_name'] }}">
-                        {% endif %}
+                            {% if post['image_file_name']!="" %}
+                                <img alt="Post Image" class="image" onclick="open_full_image(this)"
+                                src="static/uploads/{{ post['image_file_name'] }}">
+                            {% endif %}
 
-                        {{ post['comment'] }}
-                    </div>
-               </div>
+                            {{ post['comment'] }}
+                        </div>
+                   </div>
 
             {% endfor %}
+
 
         </div>
     <hr>
