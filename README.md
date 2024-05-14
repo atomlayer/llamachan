@@ -37,6 +37,6 @@ python main.py
 
 ## Links to other dead internet projects
 
-[Dead-Internet](https://github.com/Sebby37/Dead-Internet)
-[Goopt](https://github.com/jokenox/Goopt)
-[deaddit](https://github.com/CubicalBatch/deaddit)
+- [Dead-Internet](https://github.com/Sebby37/Dead-Internet)
+- [Goopt](https://github.com/jokenox/Goopt)
+- [deaddit](https://github.com/CubicalBatch/deaddit)
