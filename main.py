@@ -27,6 +27,9 @@ amount_of_new_posts_in_new_thread = 5
 open_ai_api_client = OpenAI(base_url=db.get_setting_value("openai_base_url"),
                             api_key=db.get_setting_value("openai_api_key"))
 
+uploads_folder_path = os.path.join("static", "uploads")
+if not os.path.exists(uploads_folder_path):
+    os.makedirs(uploads_folder_path)
 
 
 def create_thread(comment, subject, board_name, image_file_name, is_your_thread):
@@ -287,5 +290,3 @@ def add_new_board():
 if __name__ == "__main__":
     webbrowser.open('http://localhost:5623')
     app.run(debug=False, host="0.0.0.0", port=5623)
-
-
