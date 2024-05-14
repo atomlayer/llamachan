@@ -25,7 +25,7 @@
 
             <label for="lineField_{{ n['short_description'] }}">{{ n['short_description'] }}:</label>
             <input type="text" id="lineField_{{ n['short_description'] }}" name="{{ n['short_description'] }}"
-                       class="long-input" required value="{{ n['value'] }}">
+                       class="long-input" value="{{ n['value'] }}">
             <br>
         {% endfor %}
         <button type="submit">Save</button>

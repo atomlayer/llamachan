@@ -1,3 +1,5 @@
+import webbrowser
+
 from flask import render_template
 import threading
 from flask import Flask, request, jsonify
@@ -282,5 +284,7 @@ def add_new_board():
 
 
 if __name__ == "__main__":
+    webbrowser.open('http://localhost:5623')
     app.run(debug=False, host="0.0.0.0", port=5623)
-    # app.run(host="0.0.0.0", port=5623)
+
+
