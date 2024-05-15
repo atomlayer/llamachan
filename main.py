@@ -1,31 +1,25 @@
 import webbrowser
-
 from flask import render_template
 import threading
 from flask import Flask, request, jsonify
-from openai import OpenAI
 import os
-
 from automatic1111_api_client import ImageGenerator
+from command_r_generator import CommandRGenerator
 from database import sql
 import uuid
 from flask import redirect, url_for
-from op_post_generator import op_post_names_generator, op_post_generator
-from thread_generator import llm_generate
 import random
 
 app = Flask(__name__)
 db = sql()
 db.db_create()
 img_generator = ImageGenerator(db)
+llm_generator = CommandRGenerator(db)
 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'gif'}
 
 amount_of_new_posts_in_new_thread = 5
-
-open_ai_api_client = OpenAI(base_url=db.get_setting_value("openai_base_url"),
-                            api_key=db.get_setting_value("openai_api_key"))
 
 uploads_folder_path = os.path.join("static", "uploads")
 if not os.path.exists(uploads_folder_path):
@@ -45,7 +39,7 @@ def generate_new_posts(thread_id, amount_of_new_posts=5):
     new_post_count = 0
 
     while new_post_count < amount_of_new_posts:
-        new_posts = llm_generate(posts, db)
+        new_posts = llm_generator.generate_new_posts(posts)
         posts.extend(new_posts)
 
         for n in new_posts:
@@ -59,7 +53,7 @@ def generate_new_posts(thread_id, amount_of_new_posts=5):
                 probability_of_a_picture_appearing_in_a_post = int(
                     db.get_setting_value("probability_of_a_picture_appearing_in_a_post"))
                 if random_number <= probability_of_a_picture_appearing_in_a_post:
-                    image_prompt = img_generator.generate_prompt(message=n)
+                    image_prompt = llm_generator.generate_image_prompt(message=n)
                     new_image_file_name = str(uuid.uuid4()) + ".png"
                     img_generator.generate_image(prompt=image_prompt, file_name=new_image_file_name)
 
@@ -172,11 +166,11 @@ def generate_image_for_op_post(thread_id, prompt):
 
 
 def generate_new_threads(board_name):
-    op_post_names = op_post_names_generator(db, board_name, open_ai_api_client)
+    op_post_names = llm_generator.generate_op_post_topics(board_name)
     op_post_names = op_post_names[:3]
 
     for op_post_name in op_post_names:
-        op_post = op_post_generator(db, open_ai_api_client, op_post_name)
+        op_post = llm_generator.generate_op_post(op_post_name)
         thread_id = create_thread(op_post, op_post_name[:150], board_name, "", is_your_thread=False)
 
         generate_new_posts(thread_id, amount_of_new_posts=3)
@@ -236,22 +230,6 @@ def view_settings():
     return render_template('settings.html', data=data)
 
 
-# import os
-# import sys
-# import subprocess
-#
-#
-# def restart_flask_app():
-#     # Get the current Python executable and script path
-#     executable = sys.executable
-#     script_path = os.path.abspath(sys.argv[0])
-#
-#     # Launch a new instance of the Flask app using subprocess
-#     subprocess.Popen([executable, script_path])
-#
-#     # Exit the current instance of the app
-#     sys.exit()
-
 @app.route('/save_settings', methods=['POST'])
 def save_settings():
     data = request.form
@@ -265,7 +243,8 @@ def save_settings():
     data["board_names"] = board_names
     data["board_name_count"] = len(board_names)
 
-    # restart_flask_app()
+    img_generator.initialize()
+    llm_generator.initialize()
 
     return render_template('settings.html', data=data)
 
