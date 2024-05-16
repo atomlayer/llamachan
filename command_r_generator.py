@@ -60,7 +60,8 @@ class CommandRGenerator(GeneratorBase):
             },
             {
                 "role": "user",
-                "content": prompt
+                "content": prompt,
+
             }],
             model=self.db.get_setting_value("model"),
             temperature=float(self.db.get_setting_value("temperature")),

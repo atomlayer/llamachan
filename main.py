@@ -4,17 +4,16 @@ import threading
 from flask import Flask, request, jsonify
 import os
 from automatic1111_api_client import ImageGenerator
-from command_r_generator import CommandRGenerator
 from database import sql
 import uuid
 from flask import redirect, url_for
-import random
+from llama3_generator import Llama3Generator
 
 app = Flask(__name__)
 db = sql()
 db.db_create()
 img_generator = ImageGenerator(db)
-llm_generator = CommandRGenerator(db)
+llm_generator = Llama3Generator(db)
 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'gif'}
@@ -28,36 +27,59 @@ if not os.path.exists(uploads_folder_path):
 
 def create_thread(comment, subject, board_name, image_file_name, is_your_thread):
     thread_id = db.create_thread(subject, board_name, is_your_thread)
-    db.add_post(comment, subject, thread_id, 1, image_file_name)
+
+    is_OP = False
+    if is_your_thread == 1:
+        is_OP = True
+
+    db.add_post(comment=comment,
+                subject=subject,
+                thread_id=thread_id,
+                number_in_thread=1,
+                image_file_name=image_file_name,
+                text_description_of_the_attached_picture="",
+                is_OP=is_OP)
     return thread_id
 
 
 def generate_new_posts(thread_id, amount_of_new_posts=5):
-    posts = [x['comment'] for x in db.get_posts_by_thread_id(thread_id)]
-    last_post_number = len(posts)
+    posts = [x for x in db.get_posts_by_thread_id(thread_id)]
+    # last_post_number = len(posts)
 
     new_post_count = 0
+    board_info = db.get_board_info_by_thread_id(thread_id)
 
     while new_post_count < amount_of_new_posts:
-        new_posts = llm_generator.generate_new_posts(posts)
+        new_posts = llm_generator.generate_new_posts(posts=posts, board_name=board_info["name"])
+
+        for i, n in enumerate(new_posts):
+            new_posts[i]["number_in_thread"] = n["id"]
+            new_posts[i]["is_OP"] = 1 if new_posts[i]["is_OP"] else 0
+            new_posts[i]["comment"] = n["text"]
+            if n.get("text_description_of_the_attached_picture") is None:
+                new_posts[i]["text_description_of_the_attached_picture"] = ""
+
+
         posts.extend(new_posts)
 
         for n in new_posts:
-            last_post_number += 1
+            # last_post_number += 1
             new_post_count += 1
 
             new_image_file_name = ""
 
-            if db.is_an_API_used_to_generate_images():
-                random_number = random.randint(0, 100)
-                probability_of_a_picture_appearing_in_a_post = int(
-                    db.get_setting_value("probability_of_a_picture_appearing_in_a_post"))
-                if random_number <= probability_of_a_picture_appearing_in_a_post:
-                    image_prompt = llm_generator.generate_image_prompt(message=n)
+            if n.get('text_description_of_the_attached_picture') and n["text_description_of_the_attached_picture"] != "":
+                if db.is_an_API_used_to_generate_images():
                     new_image_file_name = str(uuid.uuid4()) + ".png"
-                    img_generator.generate_image(prompt=image_prompt, file_name=new_image_file_name)
+                    img_generator.generate_image(prompt=n["image_description"], file_name=new_image_file_name)
 
-            db.add_post(n, "", thread_id, last_post_number, new_image_file_name)
+            db.add_post(comment=n["comment"],
+                        subject="",
+                        thread_id=thread_id,
+                        number_in_thread=n["number_in_thread"],
+                        image_file_name=new_image_file_name,
+                        text_description_of_the_attached_picture=n["text_description_of_the_attached_picture"],
+                        is_OP=n["is_OP"])
 
 
 @app.route('/get_more_posts', methods=['POST'])
@@ -146,13 +168,18 @@ def add_post():
 
     new_image_file_name = ""
 
-    if db.is_an_API_used_to_generate_images():
-        if request.files.get('image_file').filename != "":
-            image_file = request.files.get('image_file')
-            new_image_file_name = upload_image(image_file)
+    if request.files.get('image_file').filename != "":
+        image_file = request.files.get('image_file')
+        new_image_file_name = upload_image(image_file)
 
     last_post_number = db.get_last_post_number_in_thread(thread_id)
-    db.add_post(comment, "", thread_id, last_post_number + 1, new_image_file_name)
+    db.add_post(comment=comment,
+                subject="",
+                thread_id=thread_id,
+                number_in_thread=last_post_number + 1,
+                image_file_name=new_image_file_name,
+                text_description_of_the_attached_picture="",
+                is_OP=True)
 
     threading.Thread(target=generate_new_posts, args=(thread_id,)).start()
 
@@ -165,24 +192,26 @@ def generate_image_for_op_post(thread_id, prompt):
     db.add_image_to_op_post(thread_id, img_file_name)
 
 
-def generate_new_threads(board_name):
-    op_post_names = llm_generator.generate_op_post_topics(board_name)
-    op_post_names = op_post_names[:3]
+def generate_new_threads(board_info):
+    op_post_topics = llm_generator.generate_op_post_topics(board_info['short_description'])
+    op_post_topics = op_post_topics[:3]
 
-    for op_post_name in op_post_names:
-        op_post = llm_generator.generate_op_post(op_post_name)
-        thread_id = create_thread(op_post, op_post_name[:150], board_name, "", is_your_thread=False)
+    for op_post_topic in op_post_topics:
+        op_post = llm_generator.generate_op_post(op_post_topic=op_post_topic,
+                                                 board_short_description=board_info['short_description'])
+        thread_id = create_thread(op_post, op_post_topic[:150], board_info['name'], "", is_your_thread=False)
 
         generate_new_posts(thread_id, amount_of_new_posts=3)
 
         if db.is_an_API_used_to_generate_images():
-            generate_image_for_op_post(thread_id, op_post_name[:150])
+            generate_image_for_op_post(thread_id, op_post_topic[:150])
 
 
 @app.route('/generate_more_threads', methods=['POST'])
 def generate_more_threads():
     data = request.get_json()
-    generate_new_threads(data["board_name"])
+    board_info = db.get_board_info(data["board_name"])
+    generate_new_threads(board_info)
     return "", 200
 
 
@@ -198,7 +227,7 @@ def handle_board(board, number=None):
 
         count_of_threads = db.get_count_of_threads_on_board(board_info["name"])
         if count_of_threads < 2:
-            generate_new_threads(board_info["name"])
+            generate_new_threads(board_info)
 
         if number is None:
             number = 0

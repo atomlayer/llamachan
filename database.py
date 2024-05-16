@@ -21,7 +21,9 @@ class sql:
                                     thread_id INTEGER,
                                     number_in_thread INTEGER,
                                     date_time_of_creation TIMESTAMP, 
-                                    image_file_name TEXT
+                                    image_file_name TEXT,
+                                    text_description_of_the_attached_picture TEXT,
+                                    is_OP INTEGER
                                 ); ''')
 
         cursor.execute('''CREATE TABLE IF NOT EXISTS threads (
@@ -59,12 +61,12 @@ class sql:
         self.add_setting(short_desc="openai_base_url", value="http://localhost:11434/v1/", category="llm api")
         self.add_setting(short_desc="openai_api_key", value="llamachan", category="llm api")
         self.add_setting(short_desc="temperature", value="0.7", category="llm api")
-        self.add_setting(short_desc="model", value="command-r:latest", category="llm api")
+        self.add_setting(short_desc="model", value="llama3:8b-instruct-q4_0", category="llm api")
         self.add_setting(short_desc="max_tokens", value="4096", category="llm api")
 
-        self.add_setting(short_desc="automatic1111_host", value="", category="automatic1111 api")
+        # self.add_setting(short_desc="automatic1111_host", value="", category="automatic1111 api")
 
-        # self.add_setting(short_desc="automatic1111_host", value="192.168.50.154", category="automatic1111 api")
+        self.add_setting(short_desc="automatic1111_host", value="192.168.50.154", category="automatic1111 api")
 
         self.add_setting(short_desc="automatic1111_port", value="7860", category="automatic1111 api")
         self.add_setting(short_desc="automatic1111_use_https", value="0", category="automatic1111 api")
@@ -78,7 +80,7 @@ class sql:
         self.add_setting(short_desc="max_tokens_for_thread", value="4096")
         self.add_setting(short_desc="max_tokens_for_image_prompt", value="150")
         self.add_setting(short_desc="number_of_threads_on_the_page", value="10")
-        self.add_setting(short_desc="probability_of_a_picture_appearing_in_a_post", value="20")
+
 
     def create_last_update_time_idx(self):
         connection = sqlite3.connect(self.db_file)
@@ -158,12 +160,18 @@ class sql:
     def get_thread_data(self, thread_id):
         return self._select_json(f"""select * from threads where id = {thread_id}""")
 
-    def add_post(self, comment, subject, thread_id, number_in_thread, image_file_name):
+    def add_post(self, comment, subject, thread_id, number_in_thread, image_file_name,
+                 text_description_of_the_attached_picture, is_OP):
+
+        is_OP = 1 if is_OP else 0
+
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
         cursor.execute('''INSERT INTO posts (comment, subject, thread_id, number_in_thread,
-                          date_time_of_creation, image_file_name) VALUES (?, ?, ?, ?, ?, ?)''',
-                       (comment, subject, thread_id, number_in_thread, datetime.now(), image_file_name))
+                          date_time_of_creation, image_file_name, 
+                          text_description_of_the_attached_picture, is_OP) VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+                       (comment, subject, thread_id, number_in_thread, datetime.now(),
+                        image_file_name, text_description_of_the_attached_picture, is_OP))
         conn.commit()
         conn.close()
         self.set_last_update_time_for_thread(thread_id)
@@ -237,8 +245,7 @@ class sql:
 
     def get_posts_by_thread_id(self, thread_id):
         posts = self._select_json(f"""
-                select id as post_id, comment, subject, number_in_thread, 
-                date_time_of_creation, image_file_name from posts
+                select * from posts
                 where thread_id = {thread_id}
                 order by number_in_thread""")
         return self.modify_posts(posts)
@@ -319,3 +326,8 @@ class sql:
         if self.get_setting_value("automatic1111_host") == "":
             return False
         return True
+
+    def get_board_info_by_thread_id(self, thread_id):
+        return self._select_json(f"""select name, short_description, full_description from boards
+                                     join threads on boards.name = threads.board_name
+                                     where threads.id = {thread_id}""")[0]
