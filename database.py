@@ -60,7 +60,7 @@ class sql:
         self.add_setting(short_desc="openai_api_key", value="llamachan", category="llm api")
         self.add_setting(short_desc="temperature", value="0.7", category="llm api")
         self.add_setting(short_desc="model", value="command-r:latest", category="llm api")
-        self.add_setting(short_desc="max_tokens", value="4096", category="llm api")
+        self.add_setting(short_desc="max_tokens", value="8192", category="llm api")
 
         self.add_setting(short_desc="automatic1111_host", value="", category="automatic1111 api")
 
@@ -273,7 +273,7 @@ class sql:
             answers = posts[1:]
             last = answers[-3:]
 
-            missed_posts_count = len(posts)-len(last)-1
+            missed_posts_count = len(posts) - len(last) - 1
 
             threads[i]["op"] = op
             threads[i]["posts"] = last

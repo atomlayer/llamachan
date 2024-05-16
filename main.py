@@ -1,3 +1,4 @@
+import math
 import webbrowser
 from flask import render_template
 import threading
@@ -170,7 +171,7 @@ def generate_new_threads(board_name):
     op_post_names = op_post_names[:3]
 
     for op_post_name in op_post_names:
-        op_post = llm_generator.generate_op_post(op_post_name)
+        op_post = llm_generator.generate_op_post(op_post_name, board_name)
         thread_id = create_thread(op_post, op_post_name[:150], board_name, "", is_your_thread=False)
 
         generate_new_posts(thread_id, amount_of_new_posts=3)
@@ -200,11 +201,11 @@ def handle_board(board, number=None):
         if count_of_threads < 2:
             generate_new_threads(board_info["name"])
 
-        if number is None:
+        if number is None or number.isdigit() is False:
             number = 0
 
-        data["pages"] = [_ for _ in
-                         range(int(count_of_threads / int(db.get_setting_value("number_of_threads_on_the_page"))))]
+        data["pages"] = \
+            [_ for _ in range(math.ceil(count_of_threads / int(db.get_setting_value("number_of_threads_on_the_page"))))]
 
         data["threads"] = db.get_board_threads_data(board_info["name"], int(number))
 

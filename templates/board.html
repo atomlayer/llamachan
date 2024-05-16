@@ -76,7 +76,7 @@
 
                         {% if thread['op']['image_file_name']!="" %}
                                 <img alt="Post Image" class="image" onclick="open_full_image(this)"
-                                src="static/uploads/{{ thread['op']['image_file_name'] }}">
+                                src="/static/uploads/{{ thread['op']['image_file_name'] }}">
                         {% endif %}
 
                         {{ thread['op']['comment'] }}
@@ -120,12 +120,17 @@
 </div>
 
 
-
+{% if data["pages"] %}
 <div id = "pages">
-    {% for page in data["pages"] %}
-         [<a class ="reply_link" href="/{{ data['board'] }}/{{ page }}">{{ page }}</a>]
-    {% endfor %}
+
+        {% for page in data["pages"] %}
+             [<a class ="reply_link" href="/{{ data['board'] }}/{{ page }}">{{ page }}</a>]
+        {% endfor %}
+
 </div>
+{% endif %}
+
+
 
 
 {% include 'links.html' %}

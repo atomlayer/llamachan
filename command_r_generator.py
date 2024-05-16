@@ -14,8 +14,10 @@ class CommandRGenerator(GeneratorBase):
                                          api_key=self.db.get_setting_value("openai_api_key"))
 
     def generate_op_post_topics(self, board_name):
-        prompt = f"""Generate thread names on 4chan 
-        in {self.db.get_board_info(board_name)[0]["short_description"]}:"""
+        board_short_description = self.db.get_board_info(board_name)[0]["short_description"]
+        prompt = f"""Generate thread topics for section '{board_short_description}' on 4chan."""
+
+        print(prompt)
 
         generated_data = self.open_ai_api_client.chat.completions.create(messages=[
             {
@@ -50,8 +52,11 @@ class CommandRGenerator(GeneratorBase):
 
         return output[:10]
 
-    def generate_op_post(self, op_post_topic):
-        prompt = f"""Generate OP-post on 4chan on theme: {op_post_topic}"""
+    def generate_op_post(self, op_post_topic, board_name):
+        board_short_description = self.db.get_board_info(board_name)[0]["short_description"]
+        prompt = f"""Generate an op-post on 4chan on the topic {op_post_topic} on the {board_short_description} board."""
+
+        print(prompt)
 
         generated_data = self.open_ai_api_client.chat.completions.create(messages=[
             {

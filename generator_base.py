@@ -12,7 +12,7 @@ class GeneratorBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def generate_op_post(self, op_post_topic):
+    def generate_op_post(self, op_post_topic, board_name):
         pass
 
     @abc.abstractmethod
